@@ -1,19 +1,23 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { create, toggle, deleted } from "../modules/todos";
-import TodoList from "./TodoList";
+
+import { getPosts, getPost } from "../modules/postApi";
 
 function TodoContainer() {
-  const todos = useSelector((state) => state.todos);
+  const { data, loading, error } = useSelector((state) => state.postApi.post);
   const dispatch = useDispatch();
 
-  const onCreate = useCallback((text) => dispatch(create(text)), [dispatch]);
-  const onToggle = useCallback((id) => dispatch(toggle(id)), [dispatch]);
-  const onRemove = useCallback((id) => dispatch(deleted(id)), [dispatch]);
+  useEffect(() => {
+    dispatch(getPost(21));
+  }, [dispatch]);
+  if (loading) return <div>로딩중</div>;
+  if (error) return <div>에러발생</div>;
+  if (!data) return <div>데이터가 없습니다.</div>;
+
   return (
     <>
-      <TodoList todos={todos} onRemove={onRemove} onToggle={onToggle} />
+      <div>{data?.data.title}</div>
     </>
   );
 }

@@ -1,7 +1,6 @@
 import React from "react";
 
 function TodoList({ todos, onRemove, onToggle }) {
-  console.log(todos);
   return (
     <>
       {todos.map((item) => (
