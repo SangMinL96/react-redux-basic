@@ -1,23 +1,30 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import { getPosts, getPost } from "../modules/postApi";
+import { getPosts } from "../modules/postApi";
 
 function TodoContainer() {
-  const { data, loading, error } = useSelector((state) => state.postApi.post);
+  const { data, loading, error } = useSelector((state) => state.postApi.posts);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getPost(21));
+    dispatch(getPosts());
   }, [dispatch]);
-  if (loading) return <div>로딩중</div>;
+  if (loading && !data) return <div>로딩중</div>;
   if (error) return <div>에러발생</div>;
   if (!data) return <div>데이터가 없습니다.</div>;
 
   return (
     <>
-      <div>{data?.data.title}</div>
+      {data?.data.map((item) => (
+        <div>
+          <Link to={`/detail/${item.id}`} id={item.id} key={item.id}>
+            {item.title}
+          </Link>
+        </div>
+      ))}
     </>
   );
 }

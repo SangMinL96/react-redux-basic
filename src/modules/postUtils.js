@@ -1,13 +1,10 @@
-import axios from "axios";
-
-export const getPostsAsync = (type, create) => {
+export const getPostsAsync = (type, create, keepData) => {
   const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`];
 
-  return (param) => async (dispatch) => {
-    console.dir(param);
-    dispatch({ type });
+  return (id) => async (dispatch) => {
+    dispatch({ type, keepData });
     try {
-      const data = await create(param);
+      const data = await create(id);
       dispatch({ type: SUCCESS, data });
     } catch (error) {
       dispatch({ type: ERROR, error });
@@ -21,9 +18,9 @@ export const intialState = {
     data: null,
     error: null,
   }),
-  loading: () => ({
+  loading: (state = null) => ({
     loading: true,
-    data: null,
+    data: state,
     error: null,
   }),
   success: (data) => ({
@@ -36,4 +33,26 @@ export const intialState = {
     data: null,
     error,
   }),
+};
+export const handleActions = (type, key, keepData) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`];
+  return (state, action) => {
+    switch (action.type) {
+      case type:
+        return {
+          ...state,
+          [key]: intialState.loading(keepData ? state[key].data : null),
+        };
+      case SUCCESS:
+        return {
+          ...state,
+          [key]: intialState.success(action.data),
+        };
+      case ERROR:
+        return {
+          ...state,
+          [key]: intialState.error(action.error),
+        };
+    }
+  };
 };
