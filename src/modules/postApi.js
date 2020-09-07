@@ -1,4 +1,10 @@
-import { getPostsAsync, intialState, handleActions } from "./postUtils";
+import {
+  getPostsAsync,
+  intialState,
+  handleActions,
+  postAsyncId,
+  handleAsync,
+} from "./postUtils";
 import { getApiPosts, getApiPostId } from "./API";
 import { create } from "./todos";
 const GET_POSTS = "GET_POSTS";
@@ -10,16 +16,7 @@ const GET_POST_ERROR = "GET_POST_ERROR";
 
 export const getPosts = getPostsAsync(GET_POSTS, getApiPosts, true);
 
-export const getPost = (id) => async (dispatch) => {
-  dispatch({ type: GET_POST, id });
-  console.log(id);
-  try {
-    const data = await getApiPostId(id);
-    dispatch({ type: GET_POST_SUCCESS, data, id });
-  } catch (error) {
-    dispatch({ type: GET_POST_ERROR, error, id });
-  }
-};
+export const getPost = postAsyncId(GET_POST, getApiPostId);
 
 let initialState = {
   posts: intialState.initial(),
@@ -27,35 +24,7 @@ let initialState = {
 };
 
 const getPostsReducer = handleActions(GET_POSTS, "posts", true);
-const getPostReducer = (state, action) => {
-  const id = action.id;
-  switch (action.type) {
-    case GET_POST:
-      return {
-        ...state,
-        post: {
-          ...state.post,
-          [id]: intialState.loading(state?.post[id]?.data),
-        },
-      };
-    case GET_POST_SUCCESS:
-      return {
-        ...state,
-        post: {
-          ...state.post,
-          [id]: intialState.success(action.data),
-        },
-      };
-    case GET_POST_ERROR:
-      return {
-        ...state,
-        post: {
-          ...state.post,
-          [id]: intialState.error(action.error),
-        },
-      };
-  }
-};
+const getPostReducer = handleAsync(GET_POST, "post");
 export default function postApi(state = initialState, action) {
   switch (action.type) {
     case GET_POSTS:
