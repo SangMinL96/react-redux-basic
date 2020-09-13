@@ -8,7 +8,7 @@ import { getPosts } from "../modules/postApi";
 function TodoContainer() {
   const { data, loading, error } = useSelector((state) => state.postApi.posts);
   const dispatch = useDispatch();
-
+  console.log(data);
   useEffect(() => {
     dispatch(getPosts());
   }, [dispatch]);
@@ -18,7 +18,7 @@ function TodoContainer() {
 
   return (
     <>
-      {data?.data.map((item) => (
+      {data?.data?.map((item) => (
         <div>
           <Link to={`/detail/${item.id}`} id={item.id} key={item.id}>
             {item.title}
